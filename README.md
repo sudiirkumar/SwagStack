@@ -1,1 +1,2 @@
 # SwagStack
+A streamlined inventory management system for college merchandise stock. Tracks and manages T-shirts, hoodies, mugs, and other branded items with real-time stock updates, low-stock alerts, and an intuitive interface for easy access. 🚀🎽
