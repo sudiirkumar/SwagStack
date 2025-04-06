@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         const result = await response.json();
         const name = result.name;
+        const isAdmin = result.is_admin;
         if (response.ok) {
             // console.log(`Response is: ${(result.name)}`);
             // alert(`Welcome back, ${name}!`);
@@ -47,6 +48,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 text: `Welcome back, ${name}!`,
             })
             //wait for 2 seconds
+            localStorage.setItem('isAdmin', isAdmin);
+            localStorage.setItem('name', name);
             setTimeout(function(){
                 window.location.href = 'dashboard.html';  // Redirect to dashboard
             }, 3000);
