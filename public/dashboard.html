@@ -58,8 +58,8 @@
             padding: 40px 30px;
             text-align: center;
             transition: transform 0.2s ease;
-            height: 180px;
-            width: 240px;
+            height: 220px;
+            width: 280px;
         }
 
         .card:hover {
@@ -116,7 +116,7 @@
 <body>
     <header>
         <h1>SwagStack</h1>
-        <p id="isAdmin">isAdmin</p>
+        <p id="isAdmin"></p>
         <nav>
             <a href="#" id="logout_btn">Logout</a>
         </nav>
@@ -138,29 +138,29 @@
                     <p>Manage product sales and orders</p>
                 </a>
             </div>
-            <div class="card">
+            <div class="card hidden" id="transactions_div">
                 <a href="#" id="transactions">
                     <i class="fas fa-history"></i>
                     <h2>Transaction Logs</h2>
                     <p>View all stock changes and activities</p>
                 </a>
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <a href="#" id="summary">
                     <i class="fas fa-chart-pie"></i>
                     <h2>Dashboard Summary</h2>
                     <p>Visual summary of inventory metrics</p>
                 </a>
-            </div>
-            <div class="card hidden" id="reports">
+            </div> -->
+            <!-- <div class="card hidden" id="reports">
                 <a href="#">
                     <i class="fas fa-file-alt"></i>
                     <h2>Reports</h2>
                     <p>Download sales and inventory reports</p>
                 </a>
-            </div>
-            <div class="card hidden" id="users">
-                <a href="#">
+            </div> -->
+            <div class="card hidden" id="users_div">
+                <a href="#" id="users">
                     <i class="fas fa-file-alt"></i>
                     <h2>Manage Users</h2>
                     <p>Manage all the users and their priviledges</p>
