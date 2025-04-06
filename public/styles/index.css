@@ -1,0 +1,93 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+  }
+
+  a{
+    color: #ffffff;
+    padding-top: 10px;
+  }
+  body {
+    background-image: url("../assests/body-bg.jpg");
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background-color: #161647;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+  }
+
+  nav a:hover {
+    color: #38bdf8;
+  }
+
+  main {
+    flex: 1;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  main h2 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+
+  main p {
+    font-size: 1.1rem;
+    color: #d6e7ff;
+    max-width: 800px;
+    padding-bottom: 20px;
+  }
+
+  .cta-button {
+    margin-top: 2rem;
+    background-color: #5751ae;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .cta-button:hover {
+    background-color: #1e40af;
+  }
+
+  footer {
+    background-color: #111827;
+    color: #9ca3af;
+    padding: 1rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }

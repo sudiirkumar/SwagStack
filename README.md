@@ -1,6 +1,5 @@
 # SwagStack - Inventory Management System
 
-![SwagStack]  
 _A simple and efficient inventory management system for college merchandise stock._
 
 ## 🚀 About the Project
