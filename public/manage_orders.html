@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Orders</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
+    h2 { margin-bottom: 1rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: center; }
+    th { background-color: #f0f0f0; }
+    button { padding: 6px 12px; margin: 4px; cursor: pointer; }
+    .btn-complete { background-color: #4CAF50; color: white; }
+    .btn-incomplete { background-color: #f44336; color: white; }
+    #order-form { margin-bottom: 2rem; }
+    input, select { padding: 6px; margin-right: 8px; }
+  </style>
+</head>
+<body>
+
+<h2>Create New Order</h2>
+<form id="order-form">
+  <input type="number" placeholder="Customer ID" id="customer_id" required />
+  <!-- <input type="number" placeholder="User ID" id="user_id" required /> -->
+  <input type="number" placeholder="Product ID" id="product_id" required />
+  <input type="number" placeholder="Quantity" id="quantity" required />
+  <!-- <input type="number" placeholder="Price" id="price" required /> -->
+  <button type="submit">Place Order</button>
+</form>
+
+<h2>All Orders</h2>
+<table id="orders-table">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Customer ID</th>
+      <th>User ID</th>
+      <th>Date</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Toggle</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+document.addEventListener('DOMContentLoaded', fetchOrders);
+
+document.getElementById('order-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const data = {
+    customer_id: document.getElementById('customer_id').value,
+    product_id: document.getElementById('product_id').value,
+    quantity: document.getElementById('quantity').value
+  };
+
+  try {
+    const res = await fetch('http://127.0.0.1:5000/api/create_order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const responseData = await res.json();
+
+    if (res.status === 201) {
+      alert('Order placed successfully!');
+      fetchOrders(); // refresh order list
+      document.getElementById('order-form').reset(); // clear form
+    } else if (res.status === 404 && responseData.error === "Product not found") {
+      alert('Product not found. Please check the Product ID.');
+    } else if (res.status === 400 && responseData.error === "Not enough stock available") {
+      alert('Not enough stock available for this product.');
+    } else {
+      alert('Unexpected error: ' + (responseData.error || 'Unknown issue'));
+    }
+
+  } catch (err) {
+    console.error("Order submission failed:", err);
+    alert('Failed to create order. Please try again later.');
+  }
+});
+
+async function fetchOrders() {
+  const res = await fetch('http://127.0.0.1:5000/api/get_orders');
+  const data = await res.json();
+  const tbody = document.querySelector('#orders-table tbody');
+  tbody.innerHTML = '';
+  data.forEach(order => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${order[0]}</td>
+      <td>${order[1] ?? '-'}</td>
+      <td>${order[2] ?? '-'}</td>
+      <td>${new Date(order[3]).toLocaleString()}</td>
+      <td>${order[4]}</td>
+      <td>${order[5] ? 'Completed' : 'Pending'}</td>
+      <td>
+        <button class="${order[5] ? 'btn-incomplete' : 'btn-complete'}"
+          onclick="toggleStatus(${order[0]}, ${!order.is_completed})">
+          ${order[5] ? 'Order Completed' : 'Mark Complete'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+async function toggleStatus(orderId, newStatus) {
+  const res = await fetch('http://127.0.0.1:5000/api/toggle_order_status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order_id: orderId, is_completed: newStatus })
+  });
+  if (res.ok) fetchOrders();
+}
+</script>
+
+</body>
+</html>

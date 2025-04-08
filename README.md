@@ -1,45 +1,73 @@
-# SwagStack - Inventory Management System
+# 🧢 SwagStack – Inventory & Order Management System
 
-_A simple and efficient inventory management system for college merchandise stock._
+SwagStack is a sleek, full-stack inventory and order management system tailored for managing college merchandise. Built with Python Flask, MySQL, and HTML/CSS/JavaScript, it allows users to handle products, orders, users, and transaction logs with ease.
 
-## 🚀 About the Project
-**SwagStack** is a web-based inventory management system designed to streamline merchandise stock tracking in colleges. Built with Flask, MySQL, and a frontend using HTML, CSS, and JavaScript, it ensures efficient stock management, sales tracking, and transaction logging. With user authentication, role-based access, and a dashboard for real-time insights, SwagStack offers an intuitive and organized inventory solution.
+---
 
-## 📌 Features
-### 🔐 User Authentication & Management
-- Secure **Login & Signup** with password hashing.
-- Role-based access (**Admin & Staff**).
-- Admins can **add, update, and remove users**.
+## 🚀 Features
 
-### 📦 Stock Management
-- **Add, modify, and remove** stock items.
-- Real-time stock updates with **low-stock alerts**.
-- Categorization and filtering for easy search.
+- 🔐 **User Management**
+  - Role-based access: Admin and Staff
+  - Manage user accounts, toggle admin status
 
-### 📊 Dashboard
-- Overview of **stock summary, low-stock items, and recent transactions**.
-- Visual insights with **charts and graphs**.
+- 📦 **Product Management**
+  - Add, update, delete merchandise items
+  - Auto-log changes via SQL triggers
 
-### 🛒 Sales & Orders
-- Record **sales transactions** and deduct stock automatically.
-- **Order management** to log incoming stock.
-- Sales and purchase reports for analysis.
+- 🧾 **Order Management**
+  - Create new orders
+  - Mark orders as completed
+  - Auto-decrease product stock
+  - Handle product deletions gracefully
 
-### 📜 Transaction History
-- **Logs all stock movements**, sales, and user actions.
-- Search and filter by **date, item, user, or transaction type**.
+- 📚 **Transaction Log**
+  - Logs every add/update/delete/sale/restock
+  - Trigger-based with timestamps and user tracking
 
-### 🔒 Security & Access Control
-- Secure **session management**.
-- **Role-based permissions** ensure restricted actions based on user roles.
+- ⚙️ **Tech Stack**
+  - Backend: Flask (Python)
+  - Frontend: HTML, CSS, JavaScript
+  - Database: MySQL
+  - ORM: Raw SQL + Flask-MySQLdb
+  - Styling: Minimal, responsive design
 
-## 🏗️ Tech Stack
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Flask (Python)
-- **Database:** MySQL
-- **Authentication:** Flask-Login, bcrypt (password hashing)
-- **Charts & Graphs:** Chart.js / D3.js (for data visualization)
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/sudiirkumar/SwagStack.git
+cd SwagStack
+```
+
+### 2. Set Up the MySQL Database
 
 
-Made with ❤️ for college inventory management!
+### 3. Update MySQL Configuration in `app.py`
 
+```python
+app.config['MYSQL_USER'] = 'yourusername'
+app.config['MYSQL_PASSWORD'] = 'yourpassword'
+app.config['MYSQL_DB'] = 'swagstack'
+```
+
+## 📌 Notes
+
+- Triggers log all important inventory operations.
+- Role-based control is enforced on frontend & backend.
+- All critical actions show confirmation alerts.
+
+---
+
+## 🧑‍💻 Contributors
+
+- [Sudhir Kumar](https://github.com/sudiirkumar)
+- [Shrey Gupta](https://github.com/ShreyIND)
+
+---
+
+## 📄 License
+
+MIT License © 2025 [Sudhir Kumar]

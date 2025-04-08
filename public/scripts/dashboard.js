@@ -32,12 +32,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     );
     sales.addEventListener('click', function() {
-        window.location.href = 'sales.html';
+        window.location.href = 'manage_orders.html';
     });
     transactions.addEventListener('click', function() {
-        window.location.href = 'transactions.html';
+        window.location.href = 'transaction-log.html';
     });
     users.addEventListener('click', function() {
-        window.location.href = 'users.html';
+        window.location.href = 'manage_users.html';
     });
 })

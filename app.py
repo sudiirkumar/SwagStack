@@ -13,6 +13,7 @@ app.config['MYSQL_DB'] = 'swagstack'
 
 mysql = MySQL(app)
 
+user_id_int = int()
 @app.route('/login', methods=['POST'])
 def login():
     username_or_email = request.json.get('username_or_email')
@@ -25,9 +26,14 @@ def login():
     user = cur.fetchone()
     cur.execute("SELECT isAdmin FROM users WHERE (email=%s OR username=%s) AND password=%s", (username_or_email, username_or_email, password))
     isAdmin = cur.fetchone()
+    cur.execute("SELECT id FROM users WHERE (email=%s OR username=%s) AND password=%s", (username_or_email, username_or_email, password))
+    user_id = cur.fetchone()
+    cur.execute("DELETE FROM current_session_user")
+    cur.execute("INSERT INTO current_session_user(user_id) VALUES (%s)", (user_id,))
+    mysql.connection.commit()
     cur.close()
     if user:
-        a = jsonify({'message': 'Login successful!', 'name': user, 'is_admin': isAdmin})
+        a = jsonify({'message': 'Login successful!', 'name': user, 'is_admin': isAdmin, 'user_id': user_id})
         return a, 200
     else:
         return jsonify({'message': 'Invalid credentials!'}), 401
@@ -187,5 +193,126 @@ def add_product():
         return jsonify({'error': 'Failed to add product'}), 500  # ✅ corrected error message
     finally:
         cursor.close()
+        
+@app.route('/api/transaction_log')
+def get_transaction_log():
+    cursor = mysql.connection.cursor()
+
+    cursor.execute("SELECT * FROM transaction_log ORDER BY timestamp DESC")
+    logs = cursor.fetchall()
+
+    cursor.close()
+    return jsonify(logs)
+
+@app.route('/api/get_users')
+def get_users():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id, username, email, name, isAdmin FROM users")
+    rows = cur.fetchall()
+    users = []
+    for row in rows:
+        users.append({
+            "id": row[0],
+            "username": row[1],
+            "email": row[2],
+            "name": row[3],
+            "isAdmin": bool(row[4])
+        })
+    return jsonify(users)
+
+@app.route('/api/delete_user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    mysql.connection.commit()
+    return jsonify({"message": "User deleted"})
+
+@app.route('/api/toggle_admin/<int:user_id>', methods=['PUT'])
+def toggle_admin(user_id):
+    data = request.get_json()
+    isAdmin = data.get("isAdmin", 0)
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE users SET isAdmin = %s WHERE id = %s", (isAdmin, user_id))
+    mysql.connection.commit()
+    return jsonify({"message": "Admin status updated"})
+
+
+@app.route('/api/create_order', methods=['POST'])
+def create_order():
+    data = request.get_json()
+    product_id = data['product_id']
+    customer_id = data['customer_id']
+    quantity = int(data['quantity'])
+
+    cursor = mysql.connection.cursor()
+
+    try:
+        # Step 1: Get current logged-in user_id from current_user table
+        cursor.execute("SELECT user_id FROM current_session_user LIMIT 1")
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'error': 'No active user session'}), 403
+        user_id = user[0]
+
+        # Step 2: Get price and stock for product
+        cursor.execute("SELECT price, stock_quantity FROM product WHERE product_id = %s", (product_id,))
+        product = cursor.fetchone()
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        price, available_stock = product
+        if quantity > available_stock:
+            return jsonify({'error': 'Not enough stock available'}), 400
+
+        total_amount = quantity * price
+
+        # Step 3: Insert into sales_order
+        cursor.execute("""
+            INSERT INTO sales_order (customer_id, user_id, total_amount)
+            VALUES (%s, %s, %s)
+        """, (customer_id, user_id, total_amount))
+        order_id = cursor.lastrowid
+
+        # Step 4: Insert into order_item
+        cursor.execute("""
+            INSERT INTO order_item (order_id, product_id, quantity, price)
+            VALUES (%s, %s, %s, %s)
+        """, (order_id, product_id, quantity, price))
+
+        # Step 5: Update product stock
+        cursor.execute("""
+            UPDATE product
+            SET stock_quantity = stock_quantity - %s
+            WHERE product_id = %s
+        """, (quantity, product_id))
+
+        # Step 6: Commit transaction
+        mysql.connection.commit()
+        return jsonify({'msg': 'Order created successfully'}), 201
+
+    except Exception as e:
+        mysql.connection.rollback()
+        print("Order creation failed:", str(e))
+        return jsonify({'error': 'Failed to create order'}), 500
+
+    finally:
+        cursor.close()
+
+@app.route('/api/get_orders', methods=['GET'])
+def get_orders():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM sales_order ORDER BY order_date DESC")
+    orders = cursor.fetchall()
+    cursor.close()
+    return jsonify(orders)
+
+@app.route('/api/toggle_order_status', methods=['POST'])
+def toggle_status():
+    data = request.json
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE sales_order SET is_completed = %s WHERE order_id = %s", (data['is_completed'], data['order_id']))
+    mysql.connection.commit()
+    cursor.close()
+    return jsonify({'msg': 'Status updated'})
 if __name__ == '__main__':
     app.run(debug=True)
