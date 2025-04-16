@@ -193,6 +193,106 @@ def add_product():
         return jsonify({'error': 'Failed to add product'}), 500  # ✅ corrected error message
     finally:
         cursor.close()
+@app.route('/api/customer', methods=['GET'])
+def get_customers():
+    try:
+        cursor = mysql.connection.cursor()
+
+        cursor.execute("SELECT * FROM customer")
+        products = cursor.fetchall()
+
+        # for p in products:
+        #     print(p)
+        # print(str(jsonify(products)))
+        
+        return jsonify(products), 200
+
+    except mysql.connector.Error as err:
+        print("Database error:", err)
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+            
+@app.route('/api/deleteCustomer/<int:customer_id>', methods=['DELETE'])
+def delete_customer(customer_id):
+    try:
+        cursor = mysql.connection.cursor()
+
+        cursor.execute("DELETE FROM customer WHERE customer_id = %s", (customer_id,))
+        mysql.connection.commit()
+
+        return jsonify({'message': 'Deleted successfully'}), 200
+
+    except mysql.connector.Error as err:
+        print("Database error:", err)
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+
+@app.route('/api/customer/<int:customer_id>', methods=['GET'])
+def get_customer(customer_id):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM customer WHERE customer_id = %s", (customer_id,))
+        row = cursor.fetchone()
+        cursor.close()
+
+        if row:
+            # Manually map the row to dict since flask_mysqldb doesn't support dictionary=True
+            customer = {
+                'customer_id': row[0],
+                'customer_name': row[1],
+                'email': row[2],
+                'phone': row[3],
+                'address': row[4]
+            }
+            return jsonify(customer), 200
+        else:
+            return jsonify({'error': 'Customer not found'}), 404
+
+    except Exception as e:
+        print("Error fetching customer:", e)
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/api/updateCustomer/<int:customer_id>', methods=['PUT'])
+def update_customer(customer_id):
+    data = request.get_json()
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("""
+            UPDATE customer 
+            SET customer_name = %s, email = %s, phone = %s, address = %s
+            WHERE customer_id = %s
+        """, (data['customer_name'], data['email'], data['phone'], data['address'], customer_id))
+        mysql.connection.commit()
+        return jsonify({'message': 'Customer updated successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Failed to update customer'}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/addCustomer', methods=['POST'])  # ✅ Changed PUT to POST
+def add_customer():
+    data = request.get_json()
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO customer (customer_name, email, phone, address)
+            VALUES (%s, %s, %s, %s)
+        """, (data['customer_name'], data['email'], data['phone'], data['address']))
+        mysql.connection.commit()
+        return jsonify({'message': 'Customer added successfully'}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Failed to add customer'}), 500  # ✅ corrected error message
+    finally:
+        cursor.close()
         
 @app.route('/api/transaction_log')
 def get_transaction_log():
@@ -314,5 +414,7 @@ def toggle_status():
     mysql.connection.commit()
     cursor.close()
     return jsonify({'msg': 'Status updated'})
+
+
 if __name__ == '__main__':
     app.run(debug=True)

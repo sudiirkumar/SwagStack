@@ -85,6 +85,12 @@ document.getElementById('order-form').addEventListener('submit', async (e) => {
 });
 
 async function fetchOrders() {
+  const name = localStorage.getItem('name');
+    if(!name){
+        alert("Please login first");
+        window.location.href = 'index.html';
+        return;
+    }
   const res = await fetch('http://127.0.0.1:5000/api/get_orders');
   const data = await res.json();
   const tbody = document.querySelector('#orders-table tbody');

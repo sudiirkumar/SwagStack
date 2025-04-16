@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const name = localStorage.getItem('name');
+    if(!name){
+        alert("Please login first");
+        window.location.href = 'index.html';
+        return;
+    }
     fetch('http://127.0.0.1:5000/api/transaction_log')
       .then(response => response.json())
       .then(data => {

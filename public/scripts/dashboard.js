@@ -5,10 +5,16 @@ document.addEventListener("DOMContentLoaded", function() {
     const sales = document.getElementById('sales');
     const transactions = document.getElementById('transactions');
     const users = document.getElementById('users');
+    const customer = document.getElementById('customer');
     const transactions_div = document.getElementById('transactions_div');
     const users_div = document.getElementById('users_div');
 
     const name = localStorage.getItem('name');
+    if(!name){
+        alert("Please login first");
+        window.location.href = 'index.html';
+        return;
+    }
     const is_admin = localStorage.getItem('isAdmin');
 
     if (is_admin === '1') {
@@ -40,4 +46,8 @@ document.addEventListener("DOMContentLoaded", function() {
     users.addEventListener('click', function() {
         window.location.href = 'manage_users.html';
     });
+    customer.addEventListener('click', function() {
+        window.location.href = 'manage-customer.html';
+    });
+
 })

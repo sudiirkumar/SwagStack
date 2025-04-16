@@ -1,6 +1,14 @@
+
 async function loadProducts() {
     const tbody = document.getElementById('product-table-body');
     tbody.innerHTML = '';
+
+    const name = localStorage.getItem('name');
+    if(!name){
+        alert("Please login first");
+        window.location.href = 'index.html';
+        return;
+    }
   
     try {
       const res = await fetch('http://127.0.0.1:5000/api/products');
